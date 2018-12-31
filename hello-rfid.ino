@@ -11,7 +11,7 @@
 #define VS1053_DCS 10
 #define VS1053_DREQ 9
 #define CARDCS 5
-#define DEFAULT_VOLUME 3
+#define DEFAULT_VOLUME 2
 #define USING_MUSIC_MAKER_WING true
 
 // * Define constants for the RFID reader
@@ -26,11 +26,13 @@
 
 // * Define constants for neopixel bar
 #define NEOPIXEL 12
+#define ONBOARD_PIXEL 8
 #define TOTAL_PIXELS 8
 
 // * Instantiate our classes
 MFRC522 mfrc522(SS_PIN, RST_PIN); // Create MFRC522 instance
 Adafruit_NeoPixel bar = Adafruit_NeoPixel(TOTAL_PIXELS, NEOPIXEL, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel onboardPixel = Adafruit_NeoPixel(1, ONBOARD_PIXEL, NEO_GRB + NEO_KHZ800);
 Adafruit_VS1053_FilePlayer player = Adafruit_VS1053_FilePlayer(VS1053_RESET, VS1053_CS, VS1053_DCS, VS1053_DREQ, CARDCS);
 
 // * setup variables for the RFID tags we're looking for
@@ -41,18 +43,19 @@ String targetTag2 = "04 52 c5 4a e6 4c 80";
 // * setup pokemon RFID tags
 String bulbasaur = "04 60 d0 4a e6 4c 81";
 String charmander = "04 78 d2 4a e6 4c 81";
-String squirtle = "";
-String pikachu = "";
+String squirtle = "04 59 d0 4a e6 4c 81";
+String pikachu = "04 60 d1 4a e6 4c 81";
 
 void setup()
 {
 	Serial.begin(9600); // Initialize serial communications with the PC
-	// while (!Serial)
-	// 	; // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
+	while (!Serial)
+		; // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
 	setupRFIDCardReader();
 	setupNeopixelBar();
 	setupMusicMakerWing();
 	signalReady();
+	onboardPixel.begin();
 
 	Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
 }
@@ -100,6 +103,7 @@ void setupRFIDCardReader()
 
 void setupNeopixelBar()
 {
+	Serial.println("starting neopixel bar");
 	bar.begin();
 }
 
@@ -167,21 +171,26 @@ void loop()
 
 		fillBar(255, 0, 0);
 		readACardOnThePreviousLoop = true;
-		player.playFullFile("CHARMA~1.MP3");
+		player.playFullFile("POKEMON/CHAR.mp3");
 	}
 	else if (content.substring(1) == bulbasaur)
 	{
 
 		fillBar(0, 255, 0);
 		readACardOnThePreviousLoop = true;
-		player.playFullFile("BULBAS~1.MP3");
+		player.playFullFile("POKEMON/BULB.mp3");
 	}
 	else if (content.substring(1) == squirtle)
 	{
-
 		fillBar(0, 0, 255);
 		readACardOnThePreviousLoop = true;
-		player.playFullFile("SQUIRTLE.MP3");
+		player.playFullFile("POKEMON/SQUIRT.mp3");
+	}
+	else if (content.substring(1) == pikachu)
+	{
+		fillBar(255, 255, 0);
+		readACardOnThePreviousLoop = true;
+		player.playFullFile("POKEMON/PIKA.mp3");
 	}
 	else
 	{
