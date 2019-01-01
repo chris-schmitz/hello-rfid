@@ -2,7 +2,8 @@
 
 A simple hello world I used to start learning RFID.
 
-![demo](readme_attachments/demo.gif)
+![finished demo](readme_attachments/finished-demo.gif)
+![in progress demo](readme_attachments/demo.gif)
 
 This is yet another hello-world that I put a bit more effort into than I should have :P
 

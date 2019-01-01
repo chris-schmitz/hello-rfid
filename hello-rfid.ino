@@ -49,8 +49,8 @@ String pikachu = "04 60 d1 4a e6 4c 81";
 void setup()
 {
 	Serial.begin(9600); // Initialize serial communications with the PC
-	while (!Serial)
-		; // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
+	// while (!Serial)
+	// ; // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
 	setupRFIDCardReader();
 	setupNeopixelBar();
 	setupMusicMakerWing();
