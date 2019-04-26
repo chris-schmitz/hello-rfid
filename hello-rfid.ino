@@ -4,6 +4,17 @@
 #include <Adafruit_NeoPixel.h>
 #include <SD.h>
 #include <Adafruit_VS1053.h>
+#include <Wire.h>
+#include <Adafruit_MPR121.h>
+
+#ifndef _BV
+#define _BV(bit) (1 << (bit))
+#endif
+
+Adafruit_MPR121 cap = Adafruit_MPR121();
+
+uint16_t lasttouched = 0;
+uint16_t currenttouched = 0;
 
 // * Define constants for the music maker wing
 #define VS1053_RESET -1
@@ -11,7 +22,7 @@
 #define VS1053_DCS 10
 #define VS1053_DREQ 9
 #define CARDCS 5
-#define DEFAULT_VOLUME 2
+#define DEFAULT_VOLUME 0
 #define USING_MUSIC_MAKER_WING true
 
 // * Define constants for the RFID reader
@@ -56,6 +67,14 @@ void setup()
 	setupMusicMakerWing();
 	signalReady();
 	onboardPixel.begin();
+
+	if (!cap.begin(0x5A))
+	{
+		Serial.println("Couldn't find the cap touch sensor");
+		while (1)
+			;
+	}
+	Serial.println("Found cap touch sensor");
 
 	Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
 }
@@ -123,10 +142,56 @@ void signalReady()
 	}
 }
 
+void handleCapTouch(uint8_t index)
+{
+	Serial.print("Touched pin ");
+	Serial.println(index);
+
+	if (index == 0)
+	{
+		player.stopPlaying();
+	}
+	if (index == 1)
+	{
+		player.stopPlaying();
+		player.startPlayingFile("songs/track001.mp3");
+	}
+	if (index == 2)
+	{
+		player.stopPlaying();
+		player.startPlayingFile("songs/track002.mp3");
+	}
+	if (index == 3)
+	{
+		player.stopPlaying();
+		player.startPlayingFile("songs/track003.mp3");
+	}
+	if (index == 4)
+	{
+		player.stopPlaying();
+		player.startPlayingFile("songs/track004.mp3");
+	}
+}
+
 bool readACardOnThePreviousLoop = false;
 
 void loop()
 {
+
+	// 	* Added in for cap touch testing
+	// currenttouched = cap.touched();
+	// for (uint8_t i = 0; i < 12; i++)
+	// {
+	// 	if ((currenttouched & _BV(i)) && !(lasttouched & _BV(i)))
+	// 	{
+	// 		handleCapTouch(i);
+	// 	}
+	// }
+
+	// lasttouched = currenttouched;
+	// return;
+
+	// // ! temp disabiling the rest of the sketch so I can test out cap touch player
 
 	// * Look for new cards
 	if (!mfrc522.PICC_IsNewCardPresent())
